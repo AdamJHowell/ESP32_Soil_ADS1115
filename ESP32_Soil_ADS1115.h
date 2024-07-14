@@ -23,8 +23,8 @@
 //const char* wifiPassword = "your Wi-Fi password";
 //const char* mqttBroker = "your broker address";
 //const int mqttPort = 1883;
-const char *HOSTNAME = "ESP32_Soil_ADS1115";                                          // The network hostname to set.
-const char *NOTES = "HiLetgo ESP32 with four soil sensors";                           // Notes about this program.
+const char *HOSTNAME = "ESP32_Soil_ADS1115";                                       // The network hostname to set.
+const char *NOTES = "HiLetgo ESP32 with four soil sensors";                        // Notes about this program.
 const char *SKETCH_TOPIC = "backYard/plantWatering/sketch";                        // The topic used to publish the sketch name.
 // #define COMMAND_TOPIC SKETCH_TOPIC "sketch"
 const char *MAC_TOPIC = "backYard/plantWatering/mac";                              // The topic used to publish the MAC address.
@@ -38,15 +38,13 @@ const char *PUBLISH_COUNT_TOPIC = "backYard/plantWatering/publishCount";        
 const char *NOTES_TOPIC = "backYard/plantWatering/NOTES";                          // The topic used to publish NOTES relevant to this project.
 // #define COMMAND_TOPIC NOTES_TOPIC "NOTES"
 const char *TEMP_C_TOPIC = "backYard/plantWatering/soil/tempC";                    // The topic used to publish the soil temperature in Celsius.
-// #define COMMAND_TOPIC TEMP_C_TOPIC "soil/tempC"
 const char *TEMP_F_TOPIC = "backYard/plantWatering/soil/tempF";                    // The topic used to publish the soil temperature in Fahrenheit.
-// #define COMMAND_TOPIC TEMP_F_TOPIC "soil/tempF"
-const char *MOISTURE_TOPIC = "backYard/plantWatering/soil/moisture";               // The topic used to publish the soil moisture.
-// #define COMMAND_TOPIC MOISTURE_TOPIC "soil/moisture"
-const char *MOISTURE_THRESHOLD_TOPIC = "backYard/plantWatering/moistureThreshold"; // The topic used to publish the soil moisture.
-// #define COMMAND_TOPIC MOISTURE_THRESHOLD_TOPIC "moistureThreshold"
+const char *MOISTURE_0_TOPIC = "backYard/plantWatering/soil/moisture0";            // The topic used to publish the soil moisture for sensor 0.
+const char *MOISTURE_1_TOPIC = "backYard/plantWatering/soil/moisture1";            // The topic used to publish the soil moisture for sensor 1.
+const char *MOISTURE_2_TOPIC = "backYard/plantWatering/soil/moisture2";            // The topic used to publish the soil moisture for sensor 2.
+const char *MOISTURE_3_TOPIC = "backYard/plantWatering/soil/moisture3";            // The topic used to publish the soil moisture for sensor 3.
+const char *MOISTURE_THRESHOLD_TOPIC = "backYard/plantWatering/moistureThreshold"; // The topic used to publish the soil moisture threshold.
 const char *PUMP_RUNNING_TOPIC = "backYard/plantWatering/pumpRunning";             // The topic used to publish the pump status.
-// #define COMMAND_TOPIC PUMP_RUNNING_TOPIC "pumpRunning"
 const unsigned int MCU_LED = 2;                                                    // Use this LED for notifications.
 const unsigned int RELAY_GPIO = 4;                                                 // The GPIO which controls relay 1.
 const unsigned int RELAY_GPIO_2 = 17;                                              // The GPIO which controls relay 2.
@@ -86,7 +84,10 @@ bool pumpRunning = false;                                                       
 bool sensorInitialized = false;                                                    // Flag to indicate that the sensor has been initialized.
 long rssi = -42;                                                                   // A global to hold the Received Signal Strength Indicator.
 float tempCArray[] = { -21.12, 21.12, 42.42 };                                     // An array to hold the 3 most recent Celsius values, initialized to reasonable levels.
-float moistureArray0[] = { 0.0, 300, 11000 };                                        // An array to hold the 3 most recent moisture values, initialized to reasonable levels.
+float moistureArray0[] = { 0.0, 300, 12000 };                                      // An array to hold the 3 most recent moisture values, initialized to reasonable levels.
+float moistureArray1[] = { 0.0, 300, 12000 };                                      // An array to hold the 3 most recent moisture values, initialized to reasonable levels.
+float moistureArray2[] = { 0.0, 300, 12000 };                                      // An array to hold the 3 most recent moisture values, initialized to reasonable levels.
+float moistureArray3[] = { 0.0, 300, 12000 };                                      // An array to hold the 3 most recent moisture values, initialized to reasonable levels.
 
 
 void pollTelemetry();

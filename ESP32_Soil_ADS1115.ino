@@ -125,9 +125,11 @@ void addValue( float valueArray[], unsigned int size, float value, float minValu
 void pollTelemetry()
 {
    rssi = WiFi.RSSI();
-  //  ads1115.readADC_SingleEnded( i );
   //  addValue( tempCArray, ARRAY_SIZE, soilSensor.getTemp(), -30, 80 );
    addValue( moistureArray0, ARRAY_SIZE, ads1115.readADC_SingleEnded( 0 ), 300, 2000 );
+   addValue( moistureArray1, ARRAY_SIZE, ads1115.readADC_SingleEnded( 1 ), 300, 2000 );
+   addValue( moistureArray2, ARRAY_SIZE, ads1115.readADC_SingleEnded( 2 ), 300, 2000 );
+   addValue( moistureArray3, ARRAY_SIZE, ads1115.readADC_SingleEnded( 3 ), 300, 2000 );
 } // End of readTelemetry() function.
 
 
@@ -252,9 +254,12 @@ void printTelemetry()
    Serial.println();
 
    Serial.println( "Environmental stats:" );
-   Serial.printf( "  Temperature: %.2f C\n", averageArray( tempCArray ) );
-   Serial.printf( "  Temperature: %.2f F\n", cToF( averageArray( tempCArray ) ) );
-   Serial.printf( "  Moisture: %u\n", averageArray( moistureArray0 ) );
+  //  Serial.printf( "  Temperature: %.2f C\n", averageArray( tempCArray ) );
+  //  Serial.printf( "  Temperature: %.2f F\n", cToF( averageArray( tempCArray ) ) );
+   Serial.printf( "  Moisture 0: %u\n", averageArray( moistureArray0 ) );
+   Serial.printf( "  Moisture 1: %u\n", averageArray( moistureArray1 ) );
+   Serial.printf( "  Moisture 2: %u\n", averageArray( moistureArray2 ) );
+   Serial.printf( "  Moisture 3: %u\n", averageArray( moistureArray3 ) );
    Serial.printf( "  Moisture threshold: %u\n", minMoisture );
    Serial.println();
 
@@ -287,15 +292,24 @@ void publishTelemetry()
       Serial.printf( "  %s\n", PUBLISH_COUNT_TOPIC );
    if( mqttClient.publish( NOTES_TOPIC, NOTES, false ) )
       Serial.printf( "  %s\n", NOTES_TOPIC );
-   dtostrf( averageArray( tempCArray ), 1, 3, buffer );
-   if( mqttClient.publish( TEMP_C_TOPIC, buffer, false ) )
-      Serial.printf( "  %s\n", TEMP_C_TOPIC );
-   dtostrf( cToF( averageArray( tempCArray ) ), 1, 3, buffer );
-   if( mqttClient.publish( TEMP_F_TOPIC, buffer, false ) )
-      Serial.printf( "  %s\n", TEMP_F_TOPIC );
+  //  dtostrf( averageArray( tempCArray ), 1, 3, buffer );
+  //  if( mqttClient.publish( TEMP_C_TOPIC, buffer, false ) )
+  //     Serial.printf( "  %s\n", TEMP_C_TOPIC );
+  //  dtostrf( cToF( averageArray( tempCArray ) ), 1, 3, buffer );
+  //  if( mqttClient.publish( TEMP_F_TOPIC, buffer, false ) )
+  //     Serial.printf( "  %s\n", TEMP_F_TOPIC );
    dtostrf( ( averageArray( moistureArray0 ) ), 1, 3, buffer );
-   if( mqttClient.publish( MOISTURE_TOPIC, buffer, false ) )
-      Serial.printf( "  %s\n", MOISTURE_TOPIC );
+   if( mqttClient.publish( MOISTURE_0_TOPIC, buffer, false ) )
+      Serial.printf( "  %s\n", MOISTURE_0_TOPIC );
+   dtostrf( ( averageArray( moistureArray1 ) ), 1, 3, buffer );
+   if( mqttClient.publish( MOISTURE_1_TOPIC, buffer, false ) )
+      Serial.printf( "  %s\n", MOISTURE_1_TOPIC );
+   dtostrf( ( averageArray( moistureArray2 ) ), 1, 3, buffer );
+   if( mqttClient.publish( MOISTURE_2_TOPIC, buffer, false ) )
+      Serial.printf( "  %s\n", MOISTURE_2_TOPIC );
+   dtostrf( ( averageArray( moistureArray3 ) ), 1, 3, buffer );
+   if( mqttClient.publish( MOISTURE_3_TOPIC, buffer, false ) )
+      Serial.printf( "  %s\n", MOISTURE_3_TOPIC );
    dtostrf( minMoisture, 1, 3, buffer );
    if( mqttClient.publish( MOISTURE_THRESHOLD_TOPIC, buffer, false ) )
       Serial.printf( "  %s\n", MOISTURE_THRESHOLD_TOPIC );
@@ -376,25 +390,16 @@ void loop()
    runPump();
 
    unsigned long time = millis();
-   // Poll the first time.  Avoid subtraction overflow.  Poll every interval.
-   if( lastPollTime == 0 || ( ( time > sensorPollInterval ) && ( time - sensorPollInterval ) > lastPollTime ) )
+   // Poll the first time.  Poll every interval.
+   if( lastPollTime == 0 || ( time - sensorPollInterval ) > lastPollTime )
    {
-      if( !sensorInitialized )
-      {
-         Serial.printf( "\n\nSensor is not initialized!\n\n" );
-         invalidValueCount++;
-      }
-      else
-      {
-         pollTelemetry();
-      }
+      pollTelemetry();
       printTelemetry();
       lastPollTime = millis();
    }
 
    time = millis();
-   // if( lastPublishTime == 0 || ( ( time > publishInterval ) && ( time - publishInterval ) > lastPublishTime ) )
-   if( ( time > publishInterval ) && ( time - publishInterval ) > lastPublishTime )
+   if( lastPublishTime == 0 || ( time - publishInterval ) > lastPublishTime )
    {
       publishCount++;
       // These next 3 lines act as a "heartbeat", to give local users a visual indication that the system is working.
